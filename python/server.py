@@ -9,12 +9,14 @@ import MySQLdb
 
 NUM_CHAMPS = 127
 IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
-QUERY = 'SELECT (SELECT COUNT(*) FROM Summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINT SummonerId) WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
+QUERY = 'SELECT (SELECT COUNT(*) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
+#QUERY = 'SELECT COUNT(*) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})'
+#QUERY2 = 'SELECT COUNT(DISTINCT SummonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})'
 
 HOST = 'localhost'
 USER = 'root'
 PASSWD = 'root'
-DB = 'riothackathon'
+DB = 'riothackaton'
 
 class SuggestServer(BaseHTTPRequestHandler):
 
@@ -83,9 +85,16 @@ class SuggestServer(BaseHTTPRequestHandler):
                     # Run SQL Query
                     self.cur.execute(sql_query)
 
-                    result = self.cur.fetchone()
-
+                    result = self.cur.fetchone()[0]
+                    """
+                    sql_query = QUERY2.format(i,j)
+                    self.cur.execute(sql_query)
+                    result2 = self.cur.fetchone()[0]
+                    result = rusult1 - result2
+                    """
                     print(result)
+                    #print(dir(result))
+                    #print(int(result[0]))
 
                     # Save to matrix
                     self.champ_matrix[i][j] = result
