@@ -7,7 +7,7 @@
       function sendGet() {
         $.get("suggestions/rndminternetman", function(data) {
           $(".result").html(data);
-          alert("Load done");
+          alert(data);
         });
         alert("Button pressed");
       }
