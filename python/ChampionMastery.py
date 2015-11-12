@@ -14,3 +14,8 @@ def getChampionMastery(summonerId, n):
   f = urllib2.urlopen("https://global.api.pvp.net/championmastery/location/NA1/player/" + str(summonerId) + "/champions?api_key=" + key)
   j = json.loads(f.read())
   return [x["championId"] for x in j[:n]]
+
+def getChampionMasteryByRank(summonerId, rank):
+  f = urllib2.urlopen("https://global.api.pvp.net/championmastery/location/NA1/player/" + str(summonerId) + "/champions?api_key=" + key)
+  j = json.loads(f.read())
+  return [x["championId"] for x in j if x["championLevel"] >= rank]
