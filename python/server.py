@@ -33,15 +33,15 @@ class SuggestServer(BaseHTTPRequestHandler):
         self.adc_mask = np.ones((NUM_CHAMPS), dtype=np.int32)
 
         for i in range(len(self.champ_id_dict)):
-            if self.champion_list[i][1] == 'Top':
+            if 'Top' in self.champion_list[i][1]:
                 self.top_mask[i] = 0
-            elif self.champion_list[i][1] == 'Mid':
+            if 'Mid' in self.champion_list[i][1]:
                 self.mid_mask[i] = 0
-            elif self.champion_list[i][1] == 'Jungle':
+            if 'Jungle' in self.champion_list[i][1]:
                 self.jungle_mask[i] = 0
-            elif self.champion_list[i][1] == 'Support':
+            if 'Support' in self.champion_list[i][1]:
                 self.support_mask[i] = 0
-            elif self.champion_list[i][1] == 'ADC':
+            if 'ADC' in self.champion_list[i][1]:
                 self.adc_mask[i] = 0
 
 
@@ -59,6 +59,30 @@ class SuggestServer(BaseHTTPRequestHandler):
 
         self.champ_matrix[4][6] = 1
         self.champ_matrix[6][4] = 1
+        
+        self.champ_matrix[12][6] = 1
+        self.champ_matrix[6][12] = 1
+        
+        self.champ_matrix[109][6] = 1
+        self.champ_matrix[6][109] = 1
+        
+        self.champ_matrix[109][7] = 1
+        self.champ_matrix[7][109] = 1
+        
+        self.champ_matrix[109][8] = 2
+        self.champ_matrix[8][109] = 2
+        
+        self.champ_matrix[109][9] = 1
+        self.champ_matrix[9][109] = 1
+        
+        self.champ_matrix[109][19] = 3
+        self.champ_matrix[19][109] = 3
+        
+        self.champ_matrix[109][5] = 3
+        self.champ_matrix[5][109] = 3
+        
+        self.champ_matrix[109][2] = 2
+        self.champ_matrix[2][109] = 2
 
 
     def do_POST(self):
@@ -114,7 +138,7 @@ class SuggestServer(BaseHTTPRequestHandler):
         champ_id_top_5 = getChampionMastery(getSummonerId(summoner_name), 5)
 
         # Convert to array indices
-        top_5 = [0]*5
+        top_5 = [0,0,0,0,0]
 
         for i in range(len(champ_id_top_5)):
             top_5[i] = self.id_to_index[str(champ_id_top_5[i])]
@@ -133,25 +157,25 @@ class SuggestServer(BaseHTTPRequestHandler):
 
         # Find the top champs for each role
         top = deepcopy(condensed)
-        top[self.top_mask] = 0
+        top[self.top_mask==1] = 0
         max_top = np.argmax(top)
         
         mid = deepcopy(condensed)
-        mid[self.mid_mask] = 0
+        mid[self.mid_mask==1] = 0
         max_mid = np.argmax(mid)
         
         jungle = deepcopy(condensed)
-        jungle[self.jungle_mask] = 0
+        jungle[self.jungle_mask==1] = 0
         max_jungle = np.argmax(jungle)
         
         support = deepcopy(condensed)
-        support[self.support_mask] = 0
+        support[self.support_mask==1] = 0
         max_support = np.argmax(support)
         
         adc = deepcopy(condensed)
-        adc[self.adc_mask] = 0
+        adc[self.adc_mask==1] = 0
         max_adc = np.argmax(adc)
-        
+
         return {'top':self.champion_list[max_top][0],
                 'mid':self.champion_list[max_mid][0],
                 'jungle':self.champion_list[max_jungle][0],
