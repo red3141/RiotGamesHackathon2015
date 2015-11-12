@@ -168,24 +168,19 @@ class SuggestServer(BaseHTTPRequestHandler):
             f.close()
 
     def retrieve_data(self, summoner_name):
-        # Do the api call to get top 5 champs
-        champ_id_top_5 = getChampionMastery(getSummonerId(summoner_name), 5)
+        # Do the api call to get the summoner's "main" champions
+        main_champs = getChampionMasteryByRank(getSummonerId(summoner_name), 3)
 
-        # Convert to array indices
-        top_5 = [0,0,0,0,0]
-
-        for i in range(len(champ_id_top_5)):
-            top_5[i] = self.id_to_index[str(champ_id_top_5[i])]
-
+        top_champs = [self.id_to_index[str(x)] for x in main_champs]
 
         # Figure out suggestions
-        condensed = self.champ_matrix[top_5][:]
+        condensed = self.champ_matrix[top_champs][:]
 
         # Sum their top 5 champs together for an aggregate score
         condensed = np.sum(condensed, axis=0)
 
         # Zero-out champs that they already play a lot
-        for i in top_5:
+        for i in top_champs:
             #condensed[:][i] = 0
             condensed[i] = 0
 
