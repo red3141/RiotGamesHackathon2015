@@ -7,6 +7,7 @@ from copy import deepcopy
 from ChampionMastery import getSummonerId, getChampionMastery
 
 NUM_CHAMPS = 127
+IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
 
 class SuggestServer(BaseHTTPRequestHandler):
 
@@ -180,11 +181,16 @@ class SuggestServer(BaseHTTPRequestHandler):
         adc[self.adc_mask==1] = 0
         max_adc = np.argmax(adc)
 
-        return {'top':{self.champion_list[max_top][0],self.id_to_url[self.champion_list[max_top][2]]},
-                'mid':self.champion_list[max_mid][0],self.id_to_url[self.champion_list[max_mid][2]]},
-                'jungle':self.champion_list[max_jungle][0],self.id_to_url[self.champion_list[max_jungle][2]]},
-                'support':self.champion_list[max_support][0],self.id_to_url[self.champion_list[max_support][2]]},
-                'adc':self.champion_list[max_adc][0],self.id_to_url[self.champion_list[max_adc][2]]}
+        return {'top':{"displayName":self.champion_list[max_top][0],
+                       "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[max_top][2])]},
+                'mid':{"displayName":self.champion_list[max_mid][0],
+                       "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[max_mid][2])]},
+                'jungle':{"displayName":self.champion_list[max_jungle][0],
+                          "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[max_jungle][2])]},
+                'support':{"displayName":self.champion_list[max_support][0],
+                           "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[max_support][2])]},
+                'adc':{"displayName":self.champion_list[max_adc][0],
+                       "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[max_adc][2])]}
                 }
 
 def main():
