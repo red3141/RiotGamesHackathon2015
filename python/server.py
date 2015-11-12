@@ -6,6 +6,8 @@ import numpy as np
 from copy import deepcopy
 from ChampionMastery import getSummonerId, getChampionMastery, getChampionMasteryByRank
 import MySQLdb
+import cPickle as pickle
+import os.path
 
 NUM_CHAMPS = 127
 IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
@@ -17,6 +19,8 @@ HOST = 'localhost'
 USER = 'root'
 PASSWD = 'root'
 DB = 'riothackaton'
+
+PICKLE_FILE = 'matrix.p'
 
 class SuggestServer(BaseHTTPRequestHandler):
 
@@ -38,6 +42,7 @@ class SuggestServer(BaseHTTPRequestHandler):
         with open('id_to_url.json') as data_file:
             self.id_to_url = json.load(data_file)
 
+        print("connecting to database")
         # Connect to the database
         self.db = MySQLdb.connect(host=HOST,
                                   user=USER,
@@ -66,11 +71,21 @@ class SuggestServer(BaseHTTPRequestHandler):
                 self.adc_mask[i] = 0
 
 
+        print("starting champ matrix")
         # Set up relation matrix
         self.champ_matrix = np.zeros((NUM_CHAMPS, NUM_CHAMPS))
+        print("finished champ matrix")
 
-        # build some data just for testing
-        self.build_matrix()
+        # Load pickle file if it exists, otherwise generate it
+        if os.path.isfile(PICKLE_FILE):
+            data = pickle.load(open(PICKLE_FILE, 'rb'))
+
+            self.champ_matrix = data
+        else:
+            # build the data
+            self.build_matrix()
+
+            pickle.dump(self.champ_matrix, open(PICKLE_FILE, 'wb'))
 
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
