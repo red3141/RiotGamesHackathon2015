@@ -12,9 +12,9 @@ IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
 QUERY = 'SELECT (SELECT COUNT(*) FROM Summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINT SummonerId) WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
 
 HOST = 'localhost'
-USER = ''
-PASSWD = ''
-DB = ''
+USER = 'root'
+PASSWD = 'root'
+DB = 'riothackathon'
 
 class SuggestServer(BaseHTTPRequestHandler):
 
@@ -168,11 +168,7 @@ class SuggestServer(BaseHTTPRequestHandler):
             f.close()
 
     def retrieve_data(self, summoner_name):
-        #TODO: temp
-        #return {"summoner_name": summoner_name}
-
-        #TODO: do the api call to get top 5 champs
-        #pretend for now
+        # Do the api call to get top 5 champs
         champ_id_top_5 = getChampionMastery(getSummonerId(summoner_name), 5)
 
         # Convert to array indices
