@@ -86,15 +86,6 @@ class SuggestServer(BaseHTTPRequestHandler):
                     self.cur.execute(sql_query)
 
                     result = self.cur.fetchone()[0]
-                    """
-                    sql_query = QUERY2.format(i,j)
-                    self.cur.execute(sql_query)
-                    result2 = self.cur.fetchone()[0]
-                    result = rusult1 - result2
-                    """
-                    print(result)
-                    #print(dir(result))
-                    #print(int(result[0]))
 
                     # Save to matrix
                     self.champ_matrix[i][j] = result
