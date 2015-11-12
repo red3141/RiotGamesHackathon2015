@@ -22,6 +22,7 @@ USE `riothackaton` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `riothackaton`.`summoner` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '',
+  `championId` VARCHAR(255) NULL DEFAULT NULL COMMENT ''
   `masteryPoints` INT(11) NULL DEFAULT NULL COMMENT '',
   `masteryRank` INT(11) NULL DEFAULT NULL COMMENT '',
   `region` VARCHAR(255) NULL DEFAULT NULL COMMENT '',
