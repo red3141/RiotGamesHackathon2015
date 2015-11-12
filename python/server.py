@@ -24,6 +24,10 @@ class SuggestServer(BaseHTTPRequestHandler):
         # Load Champ ID to index mapping dictionary
         with open('id_to_index.json') as data_file:
             self.id_to_index = json.load(data_file)
+        
+        # Load Champ ID to url mapping dictionary
+        with open('id_to_url.json') as data_file:
+            self.id_to_url = json.load(data_file)
 
         # Build lane index masks for the relation matrix
         self.top_mask = np.ones((NUM_CHAMPS), dtype=np.int32)
@@ -176,11 +180,11 @@ class SuggestServer(BaseHTTPRequestHandler):
         adc[self.adc_mask==1] = 0
         max_adc = np.argmax(adc)
 
-        return {'top':self.champion_list[max_top][0],
-                'mid':self.champion_list[max_mid][0],
-                'jungle':self.champion_list[max_jungle][0],
-                'support':self.champion_list[max_support][0],
-                'adc':self.champion_list[max_adc][0]
+        return {'top':{self.champion_list[max_top][0],self.id_to_url[self.champion_list[max_top][2]]},
+                'mid':self.champion_list[max_mid][0],self.id_to_url[self.champion_list[max_mid][2]]},
+                'jungle':self.champion_list[max_jungle][0],self.id_to_url[self.champion_list[max_jungle][2]]},
+                'support':self.champion_list[max_support][0],self.id_to_url[self.champion_list[max_support][2]]},
+                'adc':self.champion_list[max_adc][0],self.id_to_url[self.champion_list[max_adc][2]]}
                 }
 
 def main():
