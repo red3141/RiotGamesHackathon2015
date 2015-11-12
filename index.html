@@ -5,7 +5,7 @@
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script >
       function sendGet() {
-        $.post("/suggestions", {summonerName: "rndminternetman"}, function(data) {
+        $.post("/suggestions", {summonerName: document.getElementById().value}, function(data) {
           $(".result").html(data);
           alert(data);
         });
@@ -14,6 +14,7 @@
     </script>
   </head>
   <body>
+    <input type="text" id="summonerNameInput" />
     <button onclick="sendGet()">Click Me!</button>
   </body>
 </html>
