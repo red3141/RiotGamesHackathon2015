@@ -5,7 +5,7 @@
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script >
       function sendGet() {
-        $.post("/suggestions", {summonerName: document.getElementById().value}, function(data) {
+        $.post("/suggestions", {summonerName: document.getElementById().value.replace(/\s/g, '')}, function(data) {
           $(".result").html(data);
           alert(data);
         });
