@@ -5,15 +5,21 @@ import json
 import numpy as np
 from copy import deepcopy
 from ChampionMastery import getSummonerId, getChampionMastery
+import MySQLdb
 
 NUM_CHAMPS = 127
 IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
+QUERY = 'SELECT (SELECT COUNT(*) FROM Summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINT SummonerId) WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
+
+HOST = 'localhost'
+USER = ''
+PASSWD = ''
+DB = ''
 
 class SuggestServer(BaseHTTPRequestHandler):
 
     def __init__(self, *args, **kwargs):
 
-        
         # Load index-champ-meta-id mapping array
         with open('champion_meta_id.json') as data_file:
             self.champion_list = json.load(data_file)
@@ -29,6 +35,14 @@ class SuggestServer(BaseHTTPRequestHandler):
         # Load Champ ID to url mapping dictionary
         with open('id_to_url.json') as data_file:
             self.id_to_url = json.load(data_file)
+
+        # Connect to the database
+        self.db = MySQLdb.connect(host=HOST,
+                                  user=USER,
+                                  passwd=PASSWD,
+                                  db=DB)
+
+        self.cur = self.db.cursor()
 
         # Build lane index masks for the relation matrix
         self.top_mask = np.ones((NUM_CHAMPS), dtype=np.int32)
@@ -54,9 +68,28 @@ class SuggestServer(BaseHTTPRequestHandler):
         self.champ_matrix = np.zeros((NUM_CHAMPS, NUM_CHAMPS))
 
         # build some data just for testing
-        self.build_dummy_matrix()
+        #self.build_dummy_matrix()
+        self.build_matrix()
 
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
+
+    def build_matrix(self):
+        # Loop through one triangle of the matrix
+        for i in range(NUM_CHAMPS):
+            for j in range(i):
+                if i != j:
+                    sql_query = QUERY.format(i,j)
+
+                    # Run SQL Query
+                    self.cur.execute(sql_query)
+
+                    result = self.cur.fetchone()
+
+                    print(result)
+
+                    # Save to matrix
+                    self.champ_matrix[i][j] = result
+                    self.champ_matrix[j][i] = result
 
     def build_dummy_matrix(self):
         self.champ_matrix[4][5] = 1
