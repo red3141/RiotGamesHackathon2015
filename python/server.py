@@ -4,7 +4,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import json
 import numpy as np
 from copy import deepcopy
-from ChampionMastery import getSummonerId, getChampionMastery
+from ChampionMastery import getSummonerId, getChampionMastery, getChampionMasteryByRank
 import MySQLdb
 
 NUM_CHAMPS = 127
@@ -70,7 +70,6 @@ class SuggestServer(BaseHTTPRequestHandler):
         self.champ_matrix = np.zeros((NUM_CHAMPS, NUM_CHAMPS))
 
         # build some data just for testing
-        #self.build_dummy_matrix()
         self.build_matrix()
 
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
@@ -90,38 +89,6 @@ class SuggestServer(BaseHTTPRequestHandler):
                     # Save to matrix
                     self.champ_matrix[i][j] = result
                     self.champ_matrix[j][i] = result
-
-    def build_dummy_matrix(self):
-        self.champ_matrix[4][5] = 1
-        self.champ_matrix[5][4] = 1
-
-        self.champ_matrix[4][6] = 1
-        self.champ_matrix[6][4] = 1
-        
-        self.champ_matrix[12][6] = 1
-        self.champ_matrix[6][12] = 1
-        
-        self.champ_matrix[109][6] = 1
-        self.champ_matrix[6][109] = 1
-        
-        self.champ_matrix[109][7] = 1
-        self.champ_matrix[7][109] = 1
-        
-        self.champ_matrix[109][8] = 2
-        self.champ_matrix[8][109] = 2
-        
-        self.champ_matrix[109][9] = 1
-        self.champ_matrix[9][109] = 1
-        
-        self.champ_matrix[109][19] = 3
-        self.champ_matrix[19][109] = 3
-        
-        self.champ_matrix[109][5] = 3
-        self.champ_matrix[5][109] = 3
-        
-        self.champ_matrix[109][2] = 2
-        self.champ_matrix[2][109] = 2
-
 
     def do_POST(self):
         if self.path == '/suggestions':
