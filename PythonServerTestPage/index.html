@@ -1,0 +1,19 @@
+<html>
+  <title>TEST</title>
+  <head>
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script >
+      function sendGet() {
+        $.get("suggestions/rndminternetman", function(data) {
+          $(".result").html(data);
+          alert("Load done");
+        });
+        alert("Button pressed");
+      }
+    </script>
+  </head>
+  <body>
+    <button onclick="sendGet()">Click Me!</button>
+  </body>
+</html>
