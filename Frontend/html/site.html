@@ -156,11 +156,12 @@
 			.done(function(json) {
 				console.log("success");
 
-				var topInfo = json.top;
-				var jgInfo = json.jungle;
-				var midInfo = json.mid;
-				var adcInfo = json.adc;
-				var supInfo = json.support;
+				var varJson = JSON.parse(json)
+				var topInfo = varJson.top;
+				var jgInfo = varJson.jungle;
+				var midInfo = varJson.mid;
+				var adcInfo = varJson.adc;
+				var supInfo = varJson.support;
 
 				$('.top-champ .img-placeholder .img').attr('style', 'background-image: url("'+topInfo[0].url+'")');
 				$('.top-champ .name').text(topInfo[0].displayName);
@@ -180,8 +181,6 @@
 				$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
 				$('#suggestion-page').delay(1500).fadeIn(1000);
 
-				$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
-				$('#suggestion-page').delay(1500).fadeIn(1000);
 				if($( window ).width() <= 768){
 					$('.top-champ').addClass('animated slideInLeft');
 					$('.jgl-champ').addClass('animated slideInRight');

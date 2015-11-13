@@ -11,9 +11,11 @@ import os.path
 from urllib2 import HTTPError
 
 NUM_CHAMPS = 127
-IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
+IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/'
 #QUERY = 'SELECT (SELECT COUNT(*) FROM (SELECT masteryPoints, masteryRank, region, summonerId, championId FROM summoner GROUP BY masteryPoints, masteryRank, region, summonerId, championId) a WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
 QUERY = 'SELECT (SELECT COUNT(*) FROM summoner WHERE masteryRank >= {2} AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= {2} AND (championId = {0} OR championId = {1})) AS difference'
+
+NORM_QUERY = 'SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= {1} AND championId = {0}'
 
 HOST = 'localhost'
 USER = 'root'
@@ -98,6 +100,9 @@ class SuggestServer(BaseHTTPRequestHandler):
 
             pickle.dump(self.champ_matrix, open(PICKLE_FILE, 'wb'))
 
+        #Optional flip the normalization
+        #self.champ_matrix = deepcopy(self.champ_matrix.T)
+
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def print_chart(self):
@@ -106,13 +111,24 @@ class SuggestServer(BaseHTTPRequestHandler):
 
 
     def build_matrix(self):
+        # Get the normalization for each champ
+        champ_counts = np.zeros((NUM_CHAMPS))
+        for i in range(NUM_CHAMPS):
+            sql_query = NORM_QUERY.format(self.champion_list[i][2], 4)
+            # Run SQL Query
+            self.cur.execute(sql_query)
+
+            result = self.cur.fetchone()[0]
+
+            champ_counts[i] = result
+
         # Loop through one triangle of the matrix
         for i in range(NUM_CHAMPS):
             for j in range(i):
                 if i != j:
                     print("row: %s column: %s" % (i,j))
                     #k=4 
-                    for k in [3,4,5]:
+                    for k in [4]:#[3,4,5]:
                         sql_query = QUERY.format(self.champion_list[i][2],self.champion_list[j][2],k)
 
                         # Run SQL Query
@@ -121,15 +137,23 @@ class SuggestServer(BaseHTTPRequestHandler):
                         result = self.cur.fetchone()[0]
 
                         # Save to matrix
-                        self.champ_matrix[i][j] += result
-                        self.champ_matrix[j][i] += result
-
+                        #self.champ_matrix[i][j] += result
+                        #self.champ_matrix[j][i] += result
+                        # normalize by champ counts
+                        self.champ_matrix[i][j] += result / champ_counts[i]
+                        self.champ_matrix[j][i] += result / champ_counts[j]
+        """
         #normalize columns (2nd index)
         for j in range(NUM_CHAMPS):
             total = sum(self.champ_matrix[:][j])
-            self.champ_matrix[:][j] /= total
-            #total = sum(self.champ_matrix[j][:])
-            #self.champ_matrix[j][:] /= total
+            #self.champ_matrix[:][j] /= total
+            # Trying out partial normalize
+            self.champ_matrix[:][j] /= (total*.85)
+        """
+        #trying out double normalize
+        #for j in range(NUM_CHAMPS):
+        #    total = sum(self.champ_matrix[j][:])
+        #    self.champ_matrix[j][:] /= total
                 
     def do_POST(self):
         if self.path == '/suggestions':
@@ -200,6 +224,31 @@ class SuggestServer(BaseHTTPRequestHandler):
 
             # send response
             self.wfile.write(chart)
+        if self.path == '/colours':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+
+            max_val = max(self.champ_matrix.ravel())
+            norm_list = (deepcopy(self.champ_matrix) * (512.0/max_val)) - 256.0
+
+            chart = '<table style="width:100%">'
+            
+            # Put in the titles
+            chart += '<tr><td></td>'
+            for i in range(NUM_CHAMPS):
+                chart += '<td style="width:50px; height:50px"><img style="width:3em; height:3em" src="%s"></td>' % (IMAGE_PREFIX+self.id_to_url[str(self.champion_list[i][2])])
+            chart += '</tr>'
+
+            for i in range(NUM_CHAMPS):
+                chart += '<tr><td><img style="width:3em; height:3em" src="%s"></td>' % (IMAGE_PREFIX+self.id_to_url[str(self.champion_list[i][2])])
+                for j in range(NUM_CHAMPS):
+                    chart += '<td style="width:3em; height:3em; background-color: rgb(%i,%i,0)"></td>' % (-min(0,int(norm_list[i][j])), max(0,int(norm_list[i][j])))
+                chart += '</tr>'
+            chart += '</table>'
+
+            # send response
+            self.wfile.write(chart)
         elif self.path == "/":
             
             #Open the static file requested and send it
@@ -214,6 +263,13 @@ class SuggestServer(BaseHTTPRequestHandler):
             f = open(curdir + './Frontend' +self.path) 
             self.send_response(200)
             self.send_header('Content-type','text/css')
+            self.end_headers()
+            self.wfile.write(f.read())
+            f.close()
+        elif self.path.endswith('.html'):
+            f = open(curdir + './Frontend/html' +self.path) 
+            self.send_response(200)
+            self.send_header('Content-type','text/html')
             self.end_headers()
             self.wfile.write(f.read())
             f.close()
@@ -256,11 +312,17 @@ class SuggestServer(BaseHTTPRequestHandler):
         #condensed = deepcopy(self.champ_matrix[top_champs][:])
 
         # Weighted sum version
-        #condensed = np.zeros((NUM_CHAMPS),dtype=np.float64)
+        """
         condensed = np.zeros((NUM_CHAMPS))
         weight = 5
         for i in top_champs:
             condensed += self.champ_matrix[i][:]*weight
+            weight -= 1
+        """
+        condensed = np.ones((NUM_CHAMPS))
+        weight = 5
+        for i in top_champs:
+            condensed *= self.champ_matrix[i][:]*weight
             weight -= 1
 
         # Sum their top 5 champs together for an aggregate score
