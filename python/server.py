@@ -111,18 +111,18 @@ class SuggestServer(BaseHTTPRequestHandler):
             for j in range(i):
                 if i != j:
                     print("row: %s column: %s" % (i,j))
-                    #for k in [3,4,5]:
-                    k=4 
-                    sql_query = QUERY.format(self.champion_list[i][2],self.champion_list[j][2],k)
+                    #k=4 
+                    for k in [3,4,5]:
+                        sql_query = QUERY.format(self.champion_list[i][2],self.champion_list[j][2],k)
 
-                    # Run SQL Query
-                    self.cur.execute(sql_query)
+                        # Run SQL Query
+                        self.cur.execute(sql_query)
 
-                    result = self.cur.fetchone()[0]
+                        result = self.cur.fetchone()[0]
 
-                    # Save to matrix
-                    self.champ_matrix[i][j] += result
-                    self.champ_matrix[j][i] += result
+                        # Save to matrix
+                        self.champ_matrix[i][j] += result
+                        self.champ_matrix[j][i] += result
 
         #normalize columns (2nd index)
         for j in range(NUM_CHAMPS):
@@ -131,26 +131,6 @@ class SuggestServer(BaseHTTPRequestHandler):
             #total = sum(self.champ_matrix[j][:])
             #self.champ_matrix[j][:] /= total
                 
-
-        """
-        i = 85
-        j = 429
-        print("row: %s column: %s" % (i,j))
-        sql_query = QUERY.format(i,j)
-
-        # Run SQL Query
-        self.cur.execute(sql_query)
-
-        result = self.cur.fetchone()
-        print(result)
-        result = result[0]
-        print(result)
-
-        # Save to matrix
-        self.champ_matrix[i][j] = result
-        self.champ_matrix[j][i] = result
-        """
-
     def do_POST(self):
         if self.path == '/suggestions':
             #summoner_name = self.path.split('/suggestions/',1)[1]
@@ -166,13 +146,11 @@ class SuggestServer(BaseHTTPRequestHandler):
               return
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
-            #self.send_header('Content-type', 'text/html')
             self.end_headers()
 
-            #np.set_printoptions(threshold=np.nan)
-            #self.print_chart()
-            #print(self.champ_matrix[:10,:10])
             print_response(response)
+
+            #json.dump(response, open('test.json', 'wb'))
 
             # send response
             #self.wfile.write(summoner_name)
