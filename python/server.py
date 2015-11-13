@@ -23,11 +23,18 @@ DB = 'riothackaton'
 PICKLE_FILE = 'matrix.p'
 
 def print_response(response):
+    print("Top: %s, %s, %s" % (response['top'][0]['displayName'], response['top'][1]['displayName'], response['top'][2]['displayName']))
+    print("Jungle: %s, %s, %s" % (response['jungle'][0]['displayName'], response['jungle'][1]['displayName'], response['jungle'][2]['displayName']))
+    print("Mid: %s, %s, %s" % (response['mid'][0]['displayName'], response['mid'][1]['displayName'], response['mid'][2]['displayName']))
+    print("ADC: %s, %s, %s" % (response['adc'][0]['displayName'], response['adc'][1]['displayName'], response['adc'][2]['displayName']))
+    print("Support: %s, %s, %s" % (response['support'][0]['displayName'], response['support'][1]['displayName'],response['support'][2]['displayName']))
+    """
     print("Top: %s" % response['top']['displayName'])
     print("Jungle: %s" % response['jungle']['displayName'])
     print("Mid: %s" % response['mid']['displayName'])
     print("ADC: %s" % response['adc']['displayName'])
     print("Support: %s" % response['support']['displayName'])
+    """
 
 class SuggestServer(BaseHTTPRequestHandler):
 
