@@ -267,7 +267,7 @@
 				url: '/suggestions',
 				type: 'POST',
 				dataType: 'text',
-				data: {summonerName: $('#summoner-input').val()}
+				data: {summonerName: $('#summoner-input').val().replace(/\s/g,'')}
 			})
 			.done(function(json) {
 				console.log("success");
