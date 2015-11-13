@@ -11,9 +11,7 @@ import os.path
 
 NUM_CHAMPS = 127
 IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
-QUERY = 'SELECT (SELECT COUNT(*) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
-#QUERY = 'SELECT COUNT(*) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})'
-#QUERY2 = 'SELECT COUNT(DISTINCT SummonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})'
+QUERY = 'SELECT (SELECT COUNT(*) FROM (SELECT masteryPoints, masteryRank, region, summonerId, championId FROM summoner GROUP BY masteryPoints, masteryRank, region, summonerId, championId) WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
 
 HOST = 'localhost'
 USER = 'root'
