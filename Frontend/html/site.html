@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Suggested Champions</title>
+	<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../css/animate.css">
+	<link rel="stylesheet" type="text/css" href="../css/site.css">
+	<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="../js/jquery-1.11.3.js"></script>
+	<script type="text/javascript" src="../js/bootstrap.min.js"></script>
+</head>
+<body>
+	<div class="background"></div>
+	<div class="head">
+		<div class="app-title"><span>L</span>eague <span>C</span>hampion <span>S</span>uggestions</div>
+
+		<div class="menu-bar">
+			<a href="site.html" class="option">HOME</a>
+			<a href="#" class="option">ABOUT</a>
+		</div>
+	</div>
+
+	<div id="home-page">
+
+		<div class="internal-body">
+			
+			<div class="general-title">
+				<h1>
+					Welcome to league champion suggestions
+				</h1>
+				<span>
+					Lorem ipsum bla bla bla...
+				</span>
+			</div>
+
+			<div class="form-div">
+				<div class="input-holder">
+					<input id="summoner-input" type="text" placeholder="Summoner Name">
+				</div>
+				<button class="custom-btn" onclick="getSuggestions()">GO</button>
+				<div class="emptySum-text hidden">Write your summoner name first!</div>
+			</div>
+		</div>
+		
+	</div>
+
+	<div id="suggestion-page">
+		<div class="internal-body container">
+
+			<div class="general-title">
+				<h1>
+					Result Webpage
+				</h1>
+				<span>
+					Lorem ipsum bla bla bla...
+				</span>
+			</div>
+
+			<div class="row">
+				<div class="top-champ col-xs-6 col-sm-2 col-sm-offset-1">
+					<div class="suggested-champ">
+						<div class="role">top</div>
+						<div class="holder">
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Darius.png')"></div>
+							</div>
+							<div class="name">Darius</div>
+						</div>
+					</div>
+				</div>
+				<div class="jgl-champ col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role">jungle</div>
+						<div class="holder">
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Kindred.png')"></div>
+							</div>
+							<div class="name">Kindred</div>
+						</div>
+					</div>
+				</div>
+				<div class="mid-champ col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role">mid</div>
+						<div class="holder">
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Ahri.png')"></div>
+							</div>
+							<div class="name">Ahri</div>
+						</div>
+					</div>
+				</div>
+				<div class="adc-champ col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role">adc</div>
+						<div class="holder">
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Vayne.png')"></div>
+							</div>
+							<div class="name">Vayne</div>
+						</div>
+					</div>
+				</div>
+				<div class="sup-champ col-xs-6 col-sm-2 col-xs-offset-3 col-sm-offset-0">
+					<div class="suggested-champ">
+						<div class="role">support</div>
+						<div class="holder">
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Braum.png')"></div>
+							</div>
+							<div class="name">Braum</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="error-page">
+		<div class="general-title">
+			<h1>
+				Ups!
+			</h1>
+			<span>
+				We couldn't find your summoner name.
+			</span>
+		</div>
+		<a class="error-link" href="#">TRY AGAIN</a>
+	</div>
+	
+	<script type="text/javascript">
+	$(document).ready(function(){
+		$('#error-page').hide();
+		$('#suggestion-page').hide();
+		animateHomePage();
+	});
+
+	function animateHomePage(){
+		$('#home-page').addClass('animated fadeInDown');
+	}
+
+	function getSuggestions(){
+
+		if ($('#summoner-input').val() == ""){
+			$('.emptySum-text').removeClass('hidden');
+		}else{
+			$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
+			$('#suggestion-page').delay(1500).fadeIn(1000);
+			if($( window ).width() <= 768){
+				$('.top-champ').addClass('animated slideInLeft');
+				$('.jgl-champ').addClass('animated slideInRight');
+				$('.mid-champ').addClass('animated slideInLeft');
+				$('.adc-champ').addClass('animated slideInRight');
+				$('.sup-champ').addClass('animated slideInUp');
+			}else{
+				$('.top-champ').addClass('animated slideInUp');
+				$('.jgl-champ').addClass('animated slideInDown');
+				$('.mid-champ').addClass('animated slideInUp');
+				$('.adc-champ').addClass('animated slideInDown');
+				$('.sup-champ').addClass('animated slideInUp');
+			}
+		}
+	}
+
+	</script>
+
+</body>
+</html>
