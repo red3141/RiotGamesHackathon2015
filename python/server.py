@@ -11,7 +11,7 @@ import os.path
 
 NUM_CHAMPS = 127
 IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
-QUERY = 'SELECT (SELECT COUNT(*) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
+QUERY = 'SELECT (SELECT COUNT(*) FROM summoner WHERE masteryRank >= 5 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 5 AND (championId = {0} OR championId = {1})) AS difference'
 #QUERY = 'SELECT COUNT(*) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})'
 #QUERY2 = 'SELECT COUNT(DISTINCT SummonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})'
 
@@ -21,6 +21,13 @@ PASSWD = 'root'
 DB = 'riothackaton'
 
 PICKLE_FILE = 'matrix.p'
+
+def print_response(response):
+    print("Top: %s" % response['top']['displayName'])
+    print("Jungle: %s" % response['jungle']['displayName'])
+    print("Mid: %s" % response['mid']['displayName'])
+    print("ADC: %s" % response['adc']['displayName'])
+    print("Support: %s" % response['support']['displayName'])
 
 class SuggestServer(BaseHTTPRequestHandler):
 
@@ -42,7 +49,6 @@ class SuggestServer(BaseHTTPRequestHandler):
         with open('id_to_url.json') as data_file:
             self.id_to_url = json.load(data_file)
 
-        print("connecting to database")
         # Connect to the database
         self.db = MySQLdb.connect(host=HOST,
                                   user=USER,
@@ -71,10 +77,8 @@ class SuggestServer(BaseHTTPRequestHandler):
                 self.adc_mask[i] = 0
 
 
-        print("starting champ matrix")
         # Set up relation matrix
         self.champ_matrix = np.zeros((NUM_CHAMPS, NUM_CHAMPS))
-        print("finished champ matrix")
 
         # Load pickle file if it exists, otherwise generate it
         if os.path.isfile(PICKLE_FILE):
@@ -88,6 +92,11 @@ class SuggestServer(BaseHTTPRequestHandler):
             pickle.dump(self.champ_matrix, open(PICKLE_FILE, 'wb'))
 
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
+    
+    def print_chart(self):
+        for i,row in enumerate(self.champ_matrix):
+            print(self.champion_list[i][0] + " " + str(row))
+
 
     def build_matrix(self):
         # Loop through one triangle of the matrix
@@ -120,7 +129,10 @@ class SuggestServer(BaseHTTPRequestHandler):
             summoner_name = summoner_name[13:]
             
             response = self.retrieve_data(summoner_name)
-            print(response)
+            np.set_printoptions(threshold=np.nan)
+            self.print_chart()
+            print(self.champ_matrix[:10,:10])
+            print_response(response)
             # send response
             #self.wfile.write(summoner_name)
             json.dump(response, self.wfile)
