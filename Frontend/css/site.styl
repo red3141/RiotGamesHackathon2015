@@ -11,6 +11,9 @@ body
 	padding-top: 82px
 	position: relative
 	
+	@media screen and (max-width: 452px)
+		padding-top 124px
+
 	.head
 		position absolute
 		top 0
@@ -147,7 +150,36 @@ body
 					
 			.emptySum-text
 				margin-top 20px
-					
+				
+	#about-page
+		margin-top 50px
+		
+		.name
+			@media screen and (max-width: 350px)
+				font-size smaller
+
+		.general-title
+			margin-top 0px !important
+
+		.row
+			padding-bottom 10px !important
+			margin-bottom 0px !important
+			border-bottom 1px solid rgba(white, .2) !important
+
+		.gt2
+			margin-top 30px !important
+			
+		.suggested-champ
+			margin-bottom 30px !important
+			
+		.r2
+			margin-bottom 20px !important
+			border-bottom none !important
+			
+			.paragr
+				margin-bottom 20px !important
+
+	#about-page
 	#suggestion-page
 		flex 1
 		display flex
@@ -155,9 +187,6 @@ body
 		
 		@media screen and (max-width: 768px)
 			margin-top 35px
-			
-		@media screen and (max-width: 355px)
-			margin-top 85px
 		
 		.general-title
 			margin-bottom 40px
