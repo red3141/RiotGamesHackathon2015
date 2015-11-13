@@ -13,7 +13,7 @@ from urllib2 import HTTPError
 NUM_CHAMPS = 127
 IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
 #QUERY = 'SELECT (SELECT COUNT(*) FROM (SELECT masteryPoints, masteryRank, region, summonerId, championId FROM summoner GROUP BY masteryPoints, masteryRank, region, summonerId, championId) a WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
-QUERY = 'SELECT (SELECT COUNT(*) FROM summoner WHERE masteryRank >= 4 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 4 AND (championId = {0} OR championId = {1})) AS difference'
+QUERY = 'SELECT (SELECT COUNT(*) FROM summoner WHERE masteryRank >= {2} AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= {2} AND (championId = {0} OR championId = {1})) AS difference'
 
 HOST = 'localhost'
 USER = 'root'
@@ -111,7 +111,9 @@ class SuggestServer(BaseHTTPRequestHandler):
             for j in range(i):
                 if i != j:
                     print("row: %s column: %s" % (i,j))
-                    sql_query = QUERY.format(self.champion_list[i][2],self.champion_list[j][2])
+                    #for k in [3,4,5]:
+                    k=4 
+                    sql_query = QUERY.format(self.champion_list[i][2],self.champion_list[j][2],k)
 
                     # Run SQL Query
                     self.cur.execute(sql_query)
@@ -119,8 +121,8 @@ class SuggestServer(BaseHTTPRequestHandler):
                     result = self.cur.fetchone()[0]
 
                     # Save to matrix
-                    self.champ_matrix[i][j] = result
-                    self.champ_matrix[j][i] = result
+                    self.champ_matrix[i][j] += result
+                    self.champ_matrix[j][i] += result
 
         #normalize columns (2nd index)
         for j in range(NUM_CHAMPS):
@@ -181,9 +183,17 @@ class SuggestServer(BaseHTTPRequestHandler):
         elif self.path == "/" or self.path.endswith('.html'):
             
             #Open the static file requested and send it
-            f = open(curdir + sep + self.path + '../index.html') 
+            #f = open(curdir + sep + self.path + '../index.html') 
+            f = open(curdir + sep + self.path + '../Frontend/html/site.html') 
             self.send_response(200)
             self.send_header('Content-type','text/html')
+            self.end_headers()
+            self.wfile.write(f.read())
+            f.close()
+        else:
+            f = open(self.path) 
+            self.send_response(200)
+            self.send_header('Content-type','text/css')
             self.end_headers()
             self.wfile.write(f.read())
             f.close()
@@ -212,12 +222,41 @@ class SuggestServer(BaseHTTPRequestHandler):
 
             # send response
             self.wfile.write(chart)
-        elif self.path == "/" or self.path.endswith('.html'):
+        elif self.path == "/":
             
             #Open the static file requested and send it
-            f = open(curdir + sep + self.path + '../index.html') 
+            #f = open(curdir + sep + self.path + '../index.html') 
+            f = open(curdir + sep + self.path + '../Frontend/html/site.html') 
             self.send_response(200)
             self.send_header('Content-type','text/html')
+            self.end_headers()
+            self.wfile.write(f.read())
+            f.close()
+        elif self.path.endswith('.css'):
+            f = open(curdir + './Frontend' +self.path) 
+            self.send_response(200)
+            self.send_header('Content-type','text/css')
+            self.end_headers()
+            self.wfile.write(f.read())
+            f.close()
+        elif self.path.endswith('.js'):
+            f = open(curdir + './Frontend' +self.path) 
+            self.send_response(200)
+            self.send_header('Content-type','text/js')
+            self.end_headers()
+            self.wfile.write(f.read())
+            f.close()
+        elif self.path.endswith('.png'):
+            f = open(curdir + './Frontend' +self.path) 
+            self.send_response(200)
+            self.send_header('Content-type','image/png')
+            self.end_headers()
+            self.wfile.write(f.read())
+            f.close()
+        elif self.path.endswith('.jpg'):
+            f = open(curdir + './Frontend' +self.path) 
+            self.send_response(200)
+            self.send_header('Content-type','image/jpg')
             self.end_headers()
             self.wfile.write(f.read())
             f.close()
