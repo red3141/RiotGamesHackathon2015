@@ -236,20 +236,24 @@ class SuggestServer(BaseHTTPRequestHandler):
             norm_list = (deepcopy(self.champ_matrix) * (256.0/max_val))
 
             #chart = '<div style="overflow-x:scroll; overflow-y:visible; padding-bottom:1px"><table style="width:100%">'
-            chart = '<div style="overflow-x:scroll; overflow-y:scroll; padding-bottom:1px"><table>'
+            #chart = '<div style="overflow-x:scroll; overflow-y:visible; padding-bottom:1px"><table>'
+            chart = '<div><table>'
             
             # Put in the titles
-            chart += '<div style="position:absolute; top:0"><tr><td></td>'
+            chart += '<div><tr><td></td>'
             for i in range(NUM_CHAMPS):
-                chart += '<td style="width:50px; height:50px; margin-left:-3px;border-left-width:3px"><img style="width:3em; height:3em;" src="%s"></td>' % (IMAGE_PREFIX+self.id_to_url[str(self.champion_list[i][2])])
+                #chart += '<td style="left:0; top:auto; position:absolute; margin-left:-3px;border-left-width:3px"><img style="width:3em; height:3em;" src="%s"></td>' % (IMAGE_PREFIX+self.id_to_url[str(self.champion_list[i][2])])
+                chart += '<td><img style="width:3em; height:3em;" src="%s"></td>' % (IMAGE_PREFIX+self.id_to_url[str(self.champion_list[i][2])])
             chart += '</tr></div>'
 
             for i in range(NUM_CHAMPS):
-                chart += '<tr><td style="position:absolute; top:auto; left:0; margin-top:-3px;border-top-width:3px">'
+                #chart += '<tr><td style="position:absolute; top:auto; left:0; margin-right:50px;">'
+                chart += '<tr><td>'
                 chart += '<img style="width:3em; height:3em" src="%s"></td>' % (IMAGE_PREFIX+self.id_to_url[str(self.champion_list[i][2])])
                 for j in range(NUM_CHAMPS):
                     #chart += '<td style="width:3em; height:3em; background-color: rgb(%i,%i,0)"></td>' % (-min(0,int(norm_list[i][j])), max(0,int(norm_list[i][j])))
                     chart += '<td style="width:3em; height:3em; background-color: rgb(0,%i,0)"></td>' % (max(0,int(norm_list[i][j])))
+                    #chart += '<td style="width:50px; height:50px; background-color: rgb(0,%i,0)"></td>' % (max(0,int(norm_list[i][j])))
                 chart += '</tr>'
             chart += '</table></div>'
 
