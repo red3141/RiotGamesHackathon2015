@@ -8,12 +8,12 @@ from ChampionMastery import getSummonerId, getChampionMastery, getChampionMaster
 import MySQLdb
 import cPickle as pickle
 import os.path
-from urllib2 import HttpError
+from urllib2 import HTTPError
 
 NUM_CHAMPS = 127
 IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
 #QUERY = 'SELECT (SELECT COUNT(*) FROM (SELECT masteryPoints, masteryRank, region, summonerId, championId FROM summoner GROUP BY masteryPoints, masteryRank, region, summonerId, championId) a WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
-QUERY = 'SELECT (SELECT COUNT(*) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 3 AND (championId = {0} OR championId = {1})) AS difference'
+QUERY = 'SELECT (SELECT COUNT(*) FROM summoner WHERE masteryRank >= 4 AND (championId = {0} OR championId = {1})) - (SELECT COUNT(DISTINCT summonerId) FROM summoner WHERE masteryRank >= 4 AND (championId = {0} OR championId = {1})) AS difference'
 
 HOST = 'localhost'
 USER = 'root'
@@ -92,7 +92,7 @@ class SuggestServer(BaseHTTPRequestHandler):
             pickle.dump(self.champ_matrix, open(PICKLE_FILE, 'wb'))
 
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
-    
+
     def print_chart(self):
         for i,row in enumerate(self.champ_matrix):
             print(self.champion_list[i][0] + " " + str(row))
@@ -117,10 +117,10 @@ class SuggestServer(BaseHTTPRequestHandler):
 
         #normalize columns (2nd index)
         for j in range(NUM_CHAMPS):
-            #total = sum(self.champ_matrix[:][j])
-            #self.champ_matrix[:][j] /= total
-            total = sum(self.champ_matrix[j][:])
-            self.champ_matrix[j][:] /= total
+            total = sum(self.champ_matrix[:][j])
+            self.champ_matrix[:][j] /= total
+            #total = sum(self.champ_matrix[j][:])
+            #self.champ_matrix[j][:] /= total
                 
 
         """
@@ -150,22 +150,19 @@ class SuggestServer(BaseHTTPRequestHandler):
 
             # Cut out the 'summonerName=' part
             summoner_name = summoner_name[13:]
-            
             response = self.retrieve_data(summoner_name)
-
             if response is None:
               self.send_response(404)
               self.end_headers()
               return
-
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             #self.send_header('Content-type', 'text/html')
             self.end_headers()
 
-            np.set_printoptions(threshold=np.nan)
-            self.print_chart()
-            print(self.champ_matrix[:10,:10])
+            #np.set_printoptions(threshold=np.nan)
+            #self.print_chart()
+            #print(self.champ_matrix[:10,:10])
             print_response(response)
 
             # send response
@@ -192,10 +189,17 @@ class SuggestServer(BaseHTTPRequestHandler):
             self.end_headers()
 
             chart = '<table style="width:100%">'
-            for i in self.champ_matrix:
-                chart += '<tr>'
-                for j in i:
-                    chart += '<td>%i</td>' % self.champ_matrix[i][j]
+            
+            # Put in the titles
+            chart += '<tr><td></td>'
+            for i in range(NUM_CHAMPS):
+                chart += '<td>%s</td>' % self.champion_list[i][0]
+            chart += '</tr>'
+
+            for i in range(NUM_CHAMPS):
+                chart += '<tr><td>%s</td>' % self.champion_list[i][0]
+                for j in range(NUM_CHAMPS):
+                    chart += '<td>%s</td>' % self.champ_matrix[i][j]
                 chart += '</tr>'
             chart += '</table>'
 
@@ -215,24 +219,37 @@ class SuggestServer(BaseHTTPRequestHandler):
         # Do the api call to get the summoner's "main" champions
         try:
           summoner_id = getSummonerId(summoner_name)
-        except HttpError as e:
+        except HTTPError as e:
           return None
-          
 
-        main_champs = getChampionMasteryByRank(summoner_id, 3)
+        played_champs_id = getChampionMasteryByRank(summoner_id, 3) # all champs above X mastery
+        main_champs = getChampionMastery(summoner_id, 5) # top X champs
 
+        played_champs = [self.id_to_index[str(x)] for x in played_champs_id]
         top_champs = [self.id_to_index[str(x)] for x in main_champs]
 
         # Figure out suggestions
-        condensed = deepcopy(self.champ_matrix[top_champs][:])
+        #condensed = deepcopy(self.champ_matrix[top_champs][:])
+
+        # Weighted sum version
+        #condensed = np.zeros((NUM_CHAMPS),dtype=np.float64)
+        condensed = np.zeros((NUM_CHAMPS))
+        weight = 5
+        for i in top_champs:
+            condensed += self.champ_matrix[i][:]*weight
+            weight -= 1
 
         # Sum their top 5 champs together for an aggregate score
-        condensed = np.sum(condensed, axis=0)
+        #condensed = np.sum(condensed, axis=0)
 
         # Zero-out champs that they already play a lot
-        for i in top_champs:
+        #for i in top_champs:
+        for i in played_champs:
             #condensed[:][i] = 0
             condensed[i] = 0
+
+        # record the top n for each role
+        n = 3
 
         # Find the top champs for each role
         top = deepcopy(condensed)
@@ -254,6 +271,62 @@ class SuggestServer(BaseHTTPRequestHandler):
         adc = deepcopy(condensed)
         adc[self.adc_mask==1] = 0
         max_adc = np.argmax(adc)
+
+        n_top = [max_top]
+        n_mid = [max_mid]
+        n_jungle = [max_jungle]
+        n_support = [max_support]
+        n_adc = [max_adc]
+        for i in range(n-1):
+            top[max_top] = 0
+            max_top = np.argmax(top)
+            n_top.append(max_top)
+            
+            mid[max_mid] = 0
+            max_mid = np.argmax(mid)
+            n_mid.append(max_mid)
+            
+            jungle[max_jungle] = 0
+            max_jungle = np.argmax(jungle)
+            n_jungle.append(max_jungle)
+            
+            support[max_support] = 0
+            max_support = np.argmax(support)
+            n_support.append(max_support)
+            
+            adc[max_adc] = 0
+            max_adc = np.argmax(adc)
+            n_adc.append(max_adc)
+
+        print("TOP:")
+        print([self.champion_list[x][0] for x in n_top])
+        print("MID:")
+        print([self.champion_list[x][0] for x in n_mid])
+        print("JUNGLE:")
+        print([self.champion_list[x][0] for x in n_jungle])
+        print("SUPPORT:")
+        print([self.champion_list[x][0] for x in n_support])
+        print("ADC:")
+        print([self.champion_list[x][0] for x in n_adc])
+        """
+        print("TOP: %s, %s, %s"% ((self.champion_list[x][0] for x in n_top)))
+        print("MID: %s, %s, %s"% [self.champion_list[x][0] for x in n_mid])
+        print("JUNGLE: %s, %s, %s"% [self.champion_list[x][0] for x in n_jungle])
+        print("SUPPORT: %s, %s, %s"% [self.champion_list[x][0] for x in n_support])
+        print("ADC: %s, %s, %s"% [self.champion_list[x][0] for x in n_adc])
+        """
+            
+        return {'top':[{"displayName":self.champion_list[x][0],
+                       "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[x][2])]} for x in n_top],
+                'mid':[{"displayName":self.champion_list[x][0],
+                       "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[x][2])]} for x in n_mid],
+                'jungle':[{"displayName":self.champion_list[x][0],
+                          "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[x][2])]} for x in n_jungle],
+                'support':[{"displayName":self.champion_list[x][0],
+                           "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[x][2])]} for x in n_support],
+                'adc':[{"displayName":self.champion_list[x][0],
+                       "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[x][2])]} for x in n_adc]
+                }
 
         return {'top':{"displayName":self.champion_list[max_top][0],
                        "url":IMAGE_PREFIX+self.id_to_url[str(self.champion_list[max_top][2])]},
