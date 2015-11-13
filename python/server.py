@@ -320,10 +320,10 @@ class SuggestServer(BaseHTTPRequestHandler):
             weight -= 1
         """
         condensed = np.ones((NUM_CHAMPS))
-        weight = 5
+        weight = 1#5
         for i in top_champs:
-            condensed *= self.champ_matrix[i][:]*weight
-            weight -= 1
+            condensed += self.champ_matrix[i][:]*weight
+            #weight -= 1
 
         # Sum their top 5 champs together for an aggregate score
         #condensed = np.sum(condensed, axis=0)

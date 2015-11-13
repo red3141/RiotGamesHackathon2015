@@ -172,6 +172,10 @@ body
 			
 			.row
 				width 100%
+				margin-bottom 20px
+				
+				@media screen and (max-width: 768px)
+					border-bottom 1px solid rgba(white, .2)
 			
 				.suggested-champ
 					text-align center
@@ -195,9 +199,17 @@ body
 						height 125px
 						width 125px
 						
+						&.tier2
+							height 100px
+							width 100px
+							
+						&.tier3
+							height 75px
+							width 75px
+						
 						@media screen and (max-width: 768px)
-							height 95px
-							width 95px
+							height 95px !important
+							width 95px !important
 							
 						.img
 							background-position: center
@@ -208,13 +220,26 @@ body
 							height 110px
 							margin 8px
 							width 110px
+							background-color black
+							
+							&.tier2
+								background-size 98px 98px
+								height 88px
+								margin 6px
+								width 88px
+								
+							&.tier3
+								background-size 98px 98px
+								height 65px
+								margin 5px
+								width 65px
 							
 							@media screen and (max-width: 768px)
-								background-size: 95px 95px
-								box-shadow inset 0 0 30px 1px #000
-								height 85px
-								margin 5px
-								width 85px
+								background-size: 95px 95px !important
+								box-shadow inset 0 0 30px 1px #000 !important
+								height 85px !important
+								margin 5px !important
+								width 85px !important
 								
 					.name
 						color #E58824
