@@ -28,10 +28,10 @@
 			
 			<div class="general-title">
 				<h1>
-					Welcome to league champion suggestions
+					Welcome to league champion suggestions!
 				</h1>
 				<span>
-					Lorem ipsum bla bla bla...
+					Input your summoner name to see recommended champions to try for each role.
 				</span>
 			</div>
 
@@ -51,66 +51,66 @@
 
 			<div class="general-title">
 				<h1>
-					Result Webpage
+					Recommended Champions
 				</h1>
 				<span>
-					Lorem ipsum bla bla bla...
+					Based on the champions you already play, we recommend trying the following champions.
 				</span>
 			</div>
 
 			<div class="row">
-				<div class="top-champ col-xs-6 col-sm-2 col-sm-offset-1">
+				<div class="col-xs-6 col-sm-2 col-sm-offset-1">
 					<div class="suggested-champ">
 						<div class="role">top</div>
-						<div class="holder">
+						<div class="top-champ">
 							<div class="img-placeholder">
-								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Darius.png')"></div>
+								<div class="img"></div>
 							</div>
-							<div class="name">Darius</div>
+							<div class="name"></div>
 						</div>
 					</div>
 				</div>
-				<div class="jgl-champ col-xs-6 col-sm-2">
+				<div class="col-xs-6 col-sm-2">
 					<div class="suggested-champ">
 						<div class="role">jungle</div>
-						<div class="holder">
+						<div class="jgl-champ">
 							<div class="img-placeholder">
-								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Kindred.png')"></div>
+								<div class="img"></div>
 							</div>
-							<div class="name">Kindred</div>
+							<div class="name"></div>
 						</div>
 					</div>
 				</div>
-				<div class="mid-champ col-xs-6 col-sm-2">
+				<div class="col-xs-6 col-sm-2">
 					<div class="suggested-champ">
 						<div class="role">mid</div>
-						<div class="holder">
+						<div class="mid-champ">
 							<div class="img-placeholder">
-								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Ahri.png')"></div>
+								<div class="img"></div>
 							</div>
-							<div class="name">Ahri</div>
+							<div class="name"></div>
 						</div>
 					</div>
 				</div>
-				<div class="adc-champ col-xs-6 col-sm-2">
+				<div class="col-xs-6 col-sm-2">
 					<div class="suggested-champ">
 						<div class="role">adc</div>
-						<div class="holder">
+						<div class="adc-champ">
 							<div class="img-placeholder">
-								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Vayne.png')"></div>
+								<div class="img"></div>
 							</div>
-							<div class="name">Vayne</div>
+							<div class="name"></div>
 						</div>
 					</div>
 				</div>
-				<div class="sup-champ col-xs-6 col-sm-2 col-xs-offset-3 col-sm-offset-0">
+				<div class="col-xs-6 col-sm-2 col-xs-offset-3 col-sm-offset-0">
 					<div class="suggested-champ">
 						<div class="role">support</div>
-						<div class="holder">
+						<div class="sup-champ">
 							<div class="img-placeholder">
-								<div class="img" style="background-image: url('http://ddragon.leagueoflegends.com/cdn/5.22.3/img/champion/Braum.png')"></div>
+								<div class="img"></div>
 							</div>
-							<div class="name">Braum</div>
+							<div class="name"></div>
 						</div>
 					</div>
 				</div>
@@ -127,7 +127,7 @@
 				We couldn't find your summoner name.
 			</span>
 		</div>
-		<a class="error-link" href="#">TRY AGAIN</a>
+		<a class="error-link" href="site.html">TRY AGAIN</a>
 	</div>
 	
 	<script type="text/javascript">
@@ -146,25 +146,64 @@
 		if ($('#summoner-input').val() == ""){
 			$('.emptySum-text').removeClass('hidden');
 		}else{
-			$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
-			$('#suggestion-page').delay(1500).fadeIn(1000);
-			if($( window ).width() <= 768){
-				$('.top-champ').addClass('animated slideInLeft');
-				$('.jgl-champ').addClass('animated slideInRight');
-				$('.mid-champ').addClass('animated slideInLeft');
-				$('.adc-champ').addClass('animated slideInRight');
-				$('.sup-champ').addClass('animated slideInUp');
-			}else{
-				$('.top-champ').addClass('animated slideInUp');
-				$('.jgl-champ').addClass('animated slideInDown');
-				$('.mid-champ').addClass('animated slideInUp');
-				$('.adc-champ').addClass('animated slideInDown');
-				$('.sup-champ').addClass('animated slideInUp');
-			}
+
+			$.ajax({
+				url: '/suggestions',
+				type: 'POST',
+				dataType: 'text',
+				data: {summonerName: $('#summoner-input').val()}
+			})
+			.done(function(json) {
+				console.log("success");
+
+				var topInfo = json.top;
+				var jgInfo = json.jungle;
+				var midInfo = json.mid;
+				var adcInfo = json.adc;
+				var supInfo = json.support;
+
+				$('.top-champ .img-placeholder .img').attr('style', 'background-image: url("'+topInfo[0].url+'")');
+				$('.top-champ .name').text(topInfo[0].displayName);
+
+				$('.jgl-champ .img-placeholder .img').attr('style', 'background-image: url("'+jgInfo[0].url+'")');
+				$('.jgl-champ .name').text(jgInfo[0].displayName);
+
+				$('.mid-champ .img-placeholder .img').attr('style', 'background-image: url("'+midInfo[0].url+'")');
+				$('.mid-champ .name').text(midInfo[0].displayName);
+
+				$('.adc-champ .img-placeholder .img').attr('style', 'background-image: url("'+adcInfo[0].url+'")');
+				$('.adc-champ .name').text(adcInfo[0].displayName);
+
+				$('.sup-champ .img-placeholder .img').attr('style', 'background-image: url("'+supInfo[0].url+'")');
+				$('.sup-champ .name').text(supInfo[0].displayName);
+
+				$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
+				$('#suggestion-page').delay(1500).fadeIn(1000);
+
+				$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
+				$('#suggestion-page').delay(1500).fadeIn(1000);
+				if($( window ).width() <= 768){
+					$('.top-champ').addClass('animated slideInLeft');
+					$('.jgl-champ').addClass('animated slideInRight');
+					$('.mid-champ').addClass('animated slideInLeft');
+					$('.adc-champ').addClass('animated slideInRight');
+					$('.sup-champ').addClass('animated slideInUp');
+				}else{
+					$('.top-champ').addClass('animated slideInUp');
+					$('.jgl-champ').addClass('animated slideInDown');
+					$('.mid-champ').addClass('animated slideInUp');
+					$('.adc-champ').addClass('animated slideInDown');
+					$('.sup-champ').addClass('animated slideInUp');
+				}
+			})
+			.fail(function() {
+				$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
+				$('#error-page').delay(1500).fadeIn(1000);
+			});
 		}
 	}
 
-	</script>
+</script>
 
 </body>
 </html>
