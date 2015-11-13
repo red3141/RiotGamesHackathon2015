@@ -17,8 +17,8 @@
 		<div class="app-title"><span>L</span>eague <span>C</span>hampion <span>S</span>uggestions</div>
 
 		<div class="menu-bar">
-			<a href="site.html" class="option">HOME</a>
-			<a href="#" class="option">ABOUT</a>
+			<a href="#" onclick="homePage()" class="option">HOME</a>
+			<a href="#" onclick="aboutPage()" class="option">ABOUT</a>
 		</div>
 	</div>
 
@@ -40,7 +40,7 @@
 					<input id="summoner-input" type="text" placeholder="Summoner Name">
 				</div>
 				<button class="custom-btn" onclick="getSuggestions()">GO</button>
-				<div class="emptySum-text hidden">Write your summoner name first!</div>
+				<div class="emptySum-text">Write your summoner name first!</div>
 			</div>
 		</div>
 		
@@ -234,6 +234,97 @@
 		</div>
 	</div>
 
+	<div id="about-page">
+		<div class="internal-body container">
+
+			<div class="general-title">
+				<h1>
+					Team Boolean Composition
+				</h1>
+				<span>
+					The ones that made this app possible.
+				</span>
+			</div>
+			
+			<div class="row">
+				<div class="col-xs-6 col-sm-2 col-sm-offset-1">
+					<div class="suggested-champ">
+						<div class="role">top</div>
+						<div>
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('../images/top.png')"></div>
+							</div>
+							<div class="name">VladLord Snow</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role">jungle</div>
+						<div>
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('../images/jun.png')"></div>
+							</div>
+							<div class="name">RndmInternetMan</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role">mid</div>
+						<div>
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('../images/mid.png')"></div>
+							</div>
+							<div class="name">Platicopter</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role">adc</div>
+						<div>
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('../images/adc.png')"></div>
+							</div>
+							<div class="name">Juandx1</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2 col-xs-offset-3 col-sm-offset-0">
+					<div class="suggested-champ">
+						<div class="role">support</div>
+						<div>
+							<div class="img-placeholder">
+								<div class="img" style="background-image: url('../images/sup.jpg')"></div>
+							</div>
+							<div class="name">Riot Adobo</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="general-title gt2">
+				<h1>
+					What the app does
+				</h1>
+			</div>
+
+			<div class="row r2">
+				<div class="col-sm-4 paragr">
+					League Champion Suggestions is an application that uses the champion mastery API to suggest champions that you might enjoy playing.
+				</div>
+				<div class="col-sm-4 paragr">
+					The application looks at the champions you have a high level of mastery on and finds champions that other North American summoners frequently master alongside those champions to use.
+				</div>
+				<div class="col-sm-4 paragr">
+					Looking at data from over 3000 North American summoners, we construct a table with the probabilities that a summoner who masters each champion also masters each other champion. Combining these probabilities lets us find the champions most recommended for you!
+				</div>
+			</div>
+
+		</div>
+	</div>
+
 	<div id="error-page">
 		<div class="general-title">
 			<h1>
@@ -243,24 +334,37 @@
 				We couldn't find your summoner name.
 			</span>
 		</div>
-		<a class="error-link" href="site.html">TRY AGAIN</a>
+		<a class="error-link" href="#" onclick="homePage()">TRY AGAIN</a>
 	</div>
 	
 	<script type="text/javascript">
 	$(document).ready(function(){
 		$('#error-page').hide();
 		$('#suggestion-page').hide();
-		animateHomePage();
+		$('#about-page').hide();
+		homePage();
 	});
 
-	function animateHomePage(){
-		$('#home-page').addClass('animated fadeInDown');
+	function homePage(){
+		$('.emptySum-text').hide();
+		$('#summoner-input').val("");
+		$('#suggestion-page').fadeOut(1000);
+		$('#error-page').fadeOut(1000);
+		$('#about-page').fadeOut(1000);
+		$('#home-page').removeClass('animated fadeOutUp').delay(1500).fadeIn(1000);
+	}
+
+	function aboutPage(){
+		$('#suggestion-page').fadeOut(1000);
+		$('#error-page').fadeOut(1000);
+		$('#home-page').fadeOut(1000);
+		$('#about-page').delay(1500).fadeIn(1000);
 	}
 
 	function getSuggestions(){
 
 		if ($('#summoner-input').val() == ""){
-			$('.emptySum-text').removeClass('hidden');
+			$('.emptySum-text').show();
 		}else{
 
 			$.ajax({
@@ -272,12 +376,11 @@
 			.done(function(json) {
 				console.log("success");
 
-				var varJson = JSON.parse(json)
-				var topInfo = varJson.top;
-				var jgInfo = varJson.jungle;
-				var midInfo = varJson.mid;
-				var adcInfo = varJson.adc;
-				var supInfo = varJson.support;
+				var topInfo = json.top;
+				var jgInfo = json.jungle;
+				var midInfo = json.mid;
+				var adcInfo = json.adc;
+				var supInfo = json.support;
 
 				$('.top-champ .img-placeholder .img').attr('style', 'background-image: url("'+topInfo[0].url+'")');
 				$('.top-champ .name').text(topInfo[0].displayName);
@@ -361,12 +464,12 @@
 					$('.sup-champ3').addClass('animated slideInUp');
 				}
 			})
-			.fail(function() {
-				$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
-				$('#error-page').delay(1500).fadeIn(1000);
-			});
-		}
-	}
+.fail(function() {
+	$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
+	$('#error-page').delay(1500).fadeIn(1000);
+});
+}
+}
 
 </script>
 
