@@ -115,6 +115,122 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="row">
+				<div class="col-xs-6 col-sm-2 col-sm-offset-1">
+					<div class="suggested-champ">
+						<div class="role visible-xs">top</div>
+						<div class="top-champ2">
+							<div class="img-placeholder tier2">
+								<div class="img tier2"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role visible-xs">jungle</div>
+						<div class="jgl-champ2">
+							<div class="img-placeholder tier2">
+								<div class="img tier2"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role visible-xs">mid</div>
+						<div class="mid-champ2">
+							<div class="img-placeholder tier2">
+								<div class="img tier2"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role visible-xs">adc</div>
+						<div class="adc-champ2">
+							<div class="img-placeholder tier2">
+								<div class="img tier2"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2 col-xs-offset-3 col-sm-offset-0">
+					<div class="suggested-champ">
+						<div class="role visible-xs">support</div>
+						<div class="sup-champ2">
+							<div class="img-placeholder tier2">
+								<div class="img tier2"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-6 col-sm-2 col-sm-offset-1">
+					<div class="suggested-champ">
+						<div class="role visible-xs">top</div>
+						<div class="top-champ3">
+							<div class="img-placeholder tier3">
+								<div class="img tier3"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role visible-xs">jungle</div>
+						<div class="jgl-champ3">
+							<div class="img-placeholder tier3">
+								<div class="img tier3"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role visible-xs">mid</div>
+						<div class="mid-champ3">
+							<div class="img-placeholder tier3">
+								<div class="img tier3"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2">
+					<div class="suggested-champ">
+						<div class="role visible-xs">adc</div>
+						<div class="adc-champ3">
+							<div class="img-placeholder tier3">
+								<div class="img tier3"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-sm-2 col-xs-offset-3 col-sm-offset-0">
+					<div class="suggested-champ">
+						<div class="role visible-xs">support</div>
+						<div class="sup-champ3">
+							<div class="img-placeholder tier3">
+								<div class="img tier3"></div>
+							</div>
+							<div class="name"></div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -177,23 +293,71 @@
 				$('.sup-champ .img-placeholder .img').attr('style', 'background-image: url("'+supInfo[0].url+'")');
 				$('.sup-champ .name').text(supInfo[0].displayName);
 
-				$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
-				$('#suggestion-page').delay(1500).fadeIn(1000);
+				$('.top-champ2 .img-placeholder .img').attr('style', 'background-image: url("'+topInfo[1].url+'")');
+				$('.top-champ2 .name').text(topInfo[1].displayName);
+
+				$('.jgl-champ2 .img-placeholder .img').attr('style', 'background-image: url("'+jgInfo[1].url+'")');
+				$('.jgl-champ2 .name').text(jgInfo[1].displayName);
+
+				$('.mid-champ2 .img-placeholder .img').attr('style', 'background-image: url("'+midInfo[1].url+'")');
+				$('.mid-champ2 .name').text(midInfo[1].displayName);
+
+				$('.adc-champ2 .img-placeholder .img').attr('style', 'background-image: url("'+adcInfo[1].url+'")');
+				$('.adc-champ2 .name').text(adcInfo[1].displayName);
+
+				$('.sup-champ2 .img-placeholder .img').attr('style', 'background-image: url("'+supInfo[1].url+'")');
+				$('.sup-champ2 .name').text(supInfo[1].displayName);
+
+				$('.top-champ3 .img-placeholder .img').attr('style', 'background-image: url("'+topInfo[2].url+'")');
+				$('.top-champ3 .name').text(topInfo[2].displayName);
+
+				$('.jgl-champ3 .img-placeholder .img').attr('style', 'background-image: url("'+jgInfo[2].url+'")');
+				$('.jgl-champ3 .name').text(jgInfo[2].displayName);
+
+				$('.mid-champ3 .img-placeholder .img').attr('style', 'background-image: url("'+midInfo[2].url+'")');
+				$('.mid-champ3 .name').text(midInfo[2].displayName);
+
+				$('.adc-champ3 .img-placeholder .img').attr('style', 'background-image: url("'+adcInfo[2].url+'")');
+				$('.adc-champ3 .name').text(adcInfo[2].displayName);
+
+				$('.sup-champ3 .img-placeholder .img').attr('style', 'background-image: url("'+supInfo[2].url+'")');
+				$('.sup-champ3 .name').text(supInfo[2].displayName);
 
 				$('#home-page').removeClass('animated fadeInDown').addClass('animated fadeOutUp').show(0).delay(1500).hide(0);
 				$('#suggestion-page').delay(1500).fadeIn(1000);
+
 				if($( window ).width() <= 768){
 					$('.top-champ').addClass('animated slideInLeft');
 					$('.jgl-champ').addClass('animated slideInRight');
 					$('.mid-champ').addClass('animated slideInLeft');
 					$('.adc-champ').addClass('animated slideInRight');
 					$('.sup-champ').addClass('animated slideInUp');
+					$('.top-champ2').addClass('animated slideInLeft');
+					$('.jgl-champ2').addClass('animated slideInRight');
+					$('.mid-champ2').addClass('animated slideInLeft');
+					$('.adc-champ2').addClass('animated slideInRight');
+					$('.sup-champ2').addClass('animated slideInUp');
+					$('.top-champ3').addClass('animated slideInLeft');
+					$('.jgl-champ3').addClass('animated slideInRight');
+					$('.mid-champ3').addClass('animated slideInLeft');
+					$('.adc-champ3').addClass('animated slideInRight');
+					$('.sup-champ3').addClass('animated slideInUp');
 				}else{
 					$('.top-champ').addClass('animated slideInUp');
 					$('.jgl-champ').addClass('animated slideInDown');
 					$('.mid-champ').addClass('animated slideInUp');
 					$('.adc-champ').addClass('animated slideInDown');
 					$('.sup-champ').addClass('animated slideInUp');
+					$('.top-champ2').addClass('animated slideInUp');
+					$('.jgl-champ2').addClass('animated slideInDown');
+					$('.mid-champ2').addClass('animated slideInUp');
+					$('.adc-champ2').addClass('animated slideInDown');
+					$('.sup-champ2').addClass('animated slideInUp');
+					$('.top-champ3').addClass('animated slideInUp');
+					$('.jgl-champ3').addClass('animated slideInDown');
+					$('.mid-champ3').addClass('animated slideInUp');
+					$('.adc-champ3').addClass('animated slideInDown');
+					$('.sup-champ3').addClass('animated slideInUp');
 				}
 			})
 			.fail(function() {
