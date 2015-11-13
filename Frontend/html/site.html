@@ -376,11 +376,12 @@
 			.done(function(json) {
 				console.log("success");
 
-				var topInfo = json.top;
-				var jgInfo = json.jungle;
-				var midInfo = json.mid;
-				var adcInfo = json.adc;
-				var supInfo = json.support;
+				var jsonVal = JSON.parse(json)
+				var topInfo = jsonVal.top;
+				var jgInfo = jsonVal.jungle;
+				var midInfo = jsonVal.mid;
+				var adcInfo = jsonVal.adc;
+				var supInfo = jsonVal.support;
 
 				$('.top-champ .img-placeholder .img').attr('style', 'background-image: url("'+topInfo[0].url+'")');
 				$('.top-champ .name').text(topInfo[0].displayName);
