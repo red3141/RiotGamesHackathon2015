@@ -8,6 +8,7 @@ from ChampionMastery import getSummonerId, getChampionMastery, getChampionMaster
 import MySQLdb
 import cPickle as pickle
 import os.path
+from urllib2 import HttpError
 
 NUM_CHAMPS = 127
 IMAGE_PREFIX = 'http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/'
@@ -105,11 +106,6 @@ class SuggestServer(BaseHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == '/suggestions':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            #self.send_header('Content-type', 'text/html')
-            self.end_headers()
-
             #summoner_name = self.path.split('/suggestions/',1)[1]
             content_len = int(self.headers.getheader('content-length', 0))
             summoner_name = self.rfile.read(content_len)
@@ -118,6 +114,16 @@ class SuggestServer(BaseHTTPRequestHandler):
             summoner_name = summoner_name[13:]
             
             response = self.retrieve_data(summoner_name)
+            if response is None:
+              self.send_response(404)
+              self.end_headers()
+              return
+
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            #self.send_header('Content-type', 'text/html')
+            self.end_headers()
+
             print(response)
             # send response
             #self.wfile.write(summoner_name)
@@ -149,7 +155,13 @@ class SuggestServer(BaseHTTPRequestHandler):
 
     def retrieve_data(self, summoner_name):
         # Do the api call to get the summoner's "main" champions
-        main_champs = getChampionMasteryByRank(getSummonerId(summoner_name), 3)
+        try:
+          summoner_id = getSummonerId(summoner_name)
+        except HttpError as e:
+          return None
+          
+
+        main_champs = getChampionMasteryByRank(summoner_id, 3)
 
         top_champs = [self.id_to_index[str(x)] for x in main_champs]
 
